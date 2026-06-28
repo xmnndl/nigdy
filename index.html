@@ -55,11 +55,26 @@
         html, body {
             background-color: var(--brand-bg);
             color: var(--brand-text);
-            cursor: none; 
+            cursor: none; /* Domyślne wyłączenie wariantu pod PC */
             overflow-x: hidden;
             -webkit-font-smoothing: antialiased;
             overscroll-behavior-y: none; 
             transition: background-color 0.4s ease, color 0.4s ease;
+        }
+
+        /* WERSJE MOBILNE / DOTYKOWE (Kluczowa łatka do Kursora):
+           Zostaw kursor na naturalne łapanie klatkami w safari a naszego uwal */
+        @media (pointer: coarse) {
+            html, body {
+                cursor: auto !important; /* Pozwala systemowo działać dla telefonów dotykom standardowym. */
+            }
+            .cursor-dot {
+                display: none !important; /* Na śmierć usuwa czarną/białą kule na Paluch */
+            }
+            /* Włączenie ponownie reakcji wskazówek jeśli jest jednak potrzebna rączka hover */
+            button, a, .cursor-hover-trigger, iframe {
+                cursor: pointer !important;
+            }
         }
 
         /* CUSTOMOWY KURSOR NEGATYWOWY */
@@ -129,7 +144,7 @@
         .magnetic-wrap { display: inline-block; }
         ::-webkit-scrollbar { width: 0px; background: transparent; }
 
-        /* CLIP-PATH TIMER (BEZ-LUKOWY BĄBEL GSAP) */
+        /* CLIP-PATH TIMER */
         #bubble-portal {
             --rad: 0%;
             position: absolute;
@@ -142,7 +157,7 @@
             -webkit-clip-path: circle(var(--rad) at 50% 50%);
         }
 
-        /* GLASSMORPHISM - APPLE CARDS DLA OSTATECZNEJ STOPKI */
+        /* GLASSMORPHISM APPLE CARDS */
         .card-wrapper { perspective: 1000px; width: 100%; }
         .glass-link {
             position: relative; display: flex; flex-direction: column; justify-content: space-between; align-items: center;
@@ -177,21 +192,19 @@
         .social-btn.youtube:hover svg { fill: #FF0000; transform: translateY(-4px) scale(1.1); }
         .social-btn.tiktok:hover svg { fill: #00f2fe; transform: translateY(-4px) scale(1.1); }
         .social-btn.discord:hover svg { fill: #5865F2; transform: translateY(-4px) scale(1.1); }
-        .social-btn { cursor: none; pointer-events: auto; }
+        .social-btn { pointer-events: auto; }
     </style>
 </head>
 <body class="selection:bg-brandText selection:text-brandBg">
 
     <div class="grain"></div>
+    <!-- Zostało bezpiecznie tutaj po zmianie ukrycia via pointer. Na pececie nadal rączkuje myszami! -->
     <div class="cursor-dot" id="cursor-dot"></div>
     <div class="grid-bg-container"><div class="grid-glow"></div></div>
 
-    <!-- LOGO 3D: Naprawa pozycji pod ramkami (top-1, top-3 left-4) co wypuści to do granicy
-         Dodałem `camera-orbit` co zbliży model aż na obrysy bez ścinania przez pudełko na fizyce
-         oraz w pozycjach orbitacji zmieni z "domyślnych z-góry" pod poziomy patryzjatu -->
-    <header class="fixed top-2 left-2 md:top-4 md:left-1 w-auto z-50 pointer-events-none origin-top-left transition-all duration-300">
+    <!-- LOGO 3D: Dobiłem jeszcze te popychacze by leżało ładnie dosunięte z minusami! :) -->
+    <header class="fixed top-2 -left-2 md:top-4 md:-left-10 w-auto z-50 pointer-events-none origin-top-left transition-all duration-300">
         <div class="perspective-container inline-block origin-top-left w-full h-full text-center">
-            
             <model-viewer 
                 id="logo-3d" 
                 src="asset/logo.glb" 
@@ -206,20 +219,21 @@
                 tone-mapping="aces"
                 exposure="1.3">
             </model-viewer>
-
         </div>
     </header>
 
-    <div class="fixed top-0 right-0 p-6 md:p-10 z-[60]">
+    <!-- ROZWIĄZANY Z TYMI SKUTKAMI TOGGLE ŚWIATŁA MOBILE 
+         teraz jest absolute domyślnie by przepaść nad headerem telefonu podczas scrolowania, ale md:fixed by wrócił się spinać koło brzegu na ekranach LCD-->
+    <div class="absolute md:fixed top-0 right-0 p-6 md:p-10 z-[60]">
         <button id="theme-toggle" aria-label="Toggle Dark Mode" class="p-2 cursor-hover-trigger outline-none rounded-full transition-transform duration-500 transform rotate-0 group pointer-events-auto">
             <img src="asset/light.svg" id="theme-icon" alt="Motyw" class="w-8 h-8 dark:invert transition-all duration-500 ease-in-out">
         </button>
     </div>
 
     <!-- GŁÓWNA TREŚĆ STRONY -->
-    <main class="w-full relative">
+    <main class="w-full relative pt-20 md:pt-0"> <!-- Margines ratujący przy content absolute top -->
         
-        <!-- SEKCJA 1: HERO CZYSTY NAPIS "NIGDY" -->
+        <!-- SEKCJA 1: HERO -->
         <section class="h-[100vh] w-full flex items-center justify-center pt-10 px-6 fade-in-hero">
             <h2 class="text-[14vw] sm:text-[9vw] md:text-[7vw] font-black uppercase tracking-tight leading-[0.85] text-center pointer-events-none text-brandText transition-colors duration-300">
                 Jak nie teraz <br />
@@ -232,18 +246,15 @@
             </h2>
         </section>
 
-        <!-- SEKCJA 2: MODUŁ SPOTIFY - STATIC GRID. POZIOMY W DESKTOPACH! PIONOWY MOBILKACH -->
+        <!-- SEKCJA 2: MODUŁ SPOTIFY  -->
         <section class="w-full flex items-center justify-center py-20 px-6 md:px-12 border-t border-brandGrid transition-colors duration-300">
             <div class="max-w-7xl w-full">
-                <!-- Informacyjnie -->
                 <h3 class="text-sm md:text-base font-bold uppercase tracking-[0.2em] opacity-50 text-brandText mb-12 text-center fade-in-scroll cursor-hover-trigger">
                     my :3
                 </h3>
                 
-                <!-- Responsywna Siatka Gid - leci w prawo aż dla kolumn dla lg (Duzych monitorów) -->
                 <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8 xl:gap-12 fade-in-scroll">
-                    
-                    <!-- KARTA #1: SWAN -->
+                    <!-- SWAN -->
                     <div class="flex flex-col gap-6 cursor-hover-trigger group">
                         <div class="flex items-center gap-4">
                             <div class="w-14 h-14 rounded-full overflow-hidden bg-brandGrid shrink-0">
@@ -252,11 +263,11 @@
                             <h4 class="text-2xl tracking-tighter uppercase font-black text-brandText">Swan</h4>
                         </div>
                         <div class="w-full bg-black/5 dark:bg-white/5 rounded-[12px] overflow-hidden shadow-sm group-hover:shadow-2xl transition-shadow duration-500 spotify-embed-zone pointer-events-auto relative z-20">
-                            <iframe src="https://open.spotify.com/embed/artist/6WPT86Oe6sftUBUH72xv3K?utm_source=generator&theme=0" width="100%" height="352" frameBorder="0" allowfullscreen="" allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture" loading="lazy"></iframe>
+                            <iframe src="https://open.spotify.com/embed/artist/4rnbBfoGYpt4qN90YZ23Gb?utm_source=generator&theme=0" width="100%" height="352" frameBorder="0" allowfullscreen="" allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture" loading="lazy"></iframe>
                         </div>
                     </div>
 
-                    <!-- KARTA #2: VVAAV -->
+                    <!-- VVAAV -->
                     <div class="flex flex-col gap-6 cursor-hover-trigger group">
                         <div class="flex items-center gap-4">
                             <div class="w-14 h-14 rounded-full overflow-hidden bg-brandGrid shrink-0">
@@ -265,11 +276,11 @@
                             <h4 class="text-2xl tracking-tighter uppercase font-black text-brandText">vvaav</h4>
                         </div>
                         <div class="w-full bg-black/5 dark:bg-white/5 rounded-[12px] overflow-hidden shadow-sm group-hover:shadow-2xl transition-shadow duration-500 spotify-embed-zone pointer-events-auto relative z-20">
-                            <iframe src="https://open.spotify.com/embed/artist/4rnbBfoGYpt4qN90YZ23Gb?utm_source=generator&theme=0" width="100%" height="352" frameBorder="0" allowfullscreen="" allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture" loading="lazy"></iframe>
+                            <iframe src="https://open.spotify.com/embed/artist/6WPT86Oe6sftUBUH72xv3K?utm_source=generator&theme=0" width="100%" height="352" frameBorder="0" allowfullscreen="" allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture" loading="lazy"></iframe>
                         </div>
                     </div>
 
-                    <!-- KARTA #3: MINDLY -->
+                    <!-- MINDLY -->
                     <div class="flex flex-col gap-6 cursor-hover-trigger group">
                         <div class="flex items-center gap-4">
                             <div class="w-14 h-14 rounded-full overflow-hidden bg-brandGrid shrink-0">
@@ -282,7 +293,7 @@
                         </div>
                     </div>
 
-                    <!-- KARTA #4: WHLTR -->
+                    <!-- WHLTR -->
                     <div class="flex flex-col gap-6 cursor-hover-trigger group">
                         <div class="flex items-center gap-4">
                             <div class="w-14 h-14 rounded-full overflow-hidden bg-brandGrid shrink-0">
@@ -294,7 +305,6 @@
                             <iframe src="https://open.spotify.com/embed/artist/2bIxGevYjiZmJvJBBWFcat?utm_source=generator&theme=0" width="100%" height="352" frameBorder="0" allowfullscreen="" allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture" loading="lazy"></iframe>
                         </div>
                     </div>
-
                 </div>
             </div>
         </section>
@@ -311,7 +321,7 @@
             </div>
         </section>
 
-        <!-- SEKCJA 4: TIKTOK Elfsight -->
+        <!-- SEKCJA 4: TIKTOK -->
         <section class="w-full bg-[#0a0a0a] text-[#f0f0f0] py-24 border-t border-brandGrid overflow-hidden fade-in-scroll transition-colors duration-300 relative z-20">
             <div class="max-w-7xl mx-auto px-6">
                 <div class="flex items-end justify-between pb-10 cursor-hover-trigger">
@@ -326,9 +336,8 @@
             </div>
         </section>
 
-        <!-- SEKCJA 5: PORTAL TIMERA BAZOWANY NA ZBUDOWANYM KLIPSOWANIU OBRAZU PRZEZ "CLIP-PATH" -->
+        <!-- SEKCJA 5: TIMER BAZOWANY CLIP-PATH -->
         <section id="timer-pin-wrapper" class="relative w-full h-[100vh] bg-brandBg overflow-hidden transition-colors duration-300">
-            
             <div id="bubble-portal-layer" class="absolute inset-0 bg-[#050505] z-10 flex items-center justify-center" style="clip-path: circle(0% at 50% 50%); -webkit-clip-path: circle(0% at 50% 50%);">
                 <div class="w-full flex flex-col items-center justify-center opacity-0 pointer-events-auto blur-md" id="timer-text-content">
                     <div class="flex flex-row justify-center items-center gap-2 sm:gap-6 md:gap-10 font-sans tracking-tighter leading-none text-white cursor-hover-trigger">
@@ -342,22 +351,20 @@
                     </div>
                 </div>
             </div>
-            
         </section>
 
-        <!-- SEKCJA 6: KONCOWE KARTY SOCIALS - Kontynuuje Czerń -->
+        <!-- SEKCJA 6: SOCIALS - CZARNE KARTY -->
         <section class="relative w-full bg-[#050505] pt-0 md:pt-10 pb-32 px-6 overflow-hidden z-20">
             <div class="max-w-6xl mx-auto flex flex-col items-center justify-center z-10 pointer-events-auto relative fade-in-scroll">
                 
                 <h3 class="text-sm font-bold uppercase tracking-[0.2em] text-white/50 mb-12 cursor-hover-trigger mt-12">Podłącz się pod proces</h3>
 
                 <div id="socials-container" class="w-full grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-6">
-                    <!-- Wygenerowane by JavaScript i zrzut ze `socials.js` -->
+                    <!-- Wygenerowane ze zrzutu ze `socials.js` -->
                 </div>
 
-                <!-- Kanał wspierający z Ikonami-->
                 <div class="w-full h-24 lg:h-32 card-wrapper" id="discord-card-wrapper">
-                    <a href="#" id="master-discord-btn" target="_blank" class="glass-link group w-full flex-row !justify-center gap-6 cursor-none hover-target pointer-events-auto relative z-30">
+                    <a href="#" id="master-discord-btn" target="_blank" class="glass-link group w-full flex-row !justify-center gap-6 pointer-events-auto relative z-30">
                         <div class="glass-content-wrap flex flex-row items-center !justify-center gap-4 w-full h-full text-white pointer-events-none">
                             <span class="font-bold uppercase tracking-widest text-lg md:text-xl">Wspólny kanał domowy</span>
                             <div class="social-btn discord inline-flex items-center pointer-events-none">
@@ -371,7 +378,7 @@
 
     </main>
 
-    <!-- WCZYTYWANIE KONFIGURACJI I LOGIKI -->
+    <!-- JS & GSAP Z GIGANTAMI -->
     <script src="daily.js"></script>
     <script src="socials.js"></script>
     <script src="https://unpkg.com/@studio-freight/lenis@1.0.39/dist/lenis.min.js"></script>
@@ -379,7 +386,7 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js"></script>
 
     <script>
-        // --- THEME TOGGLE (Dark / Light) ---
+        // --- THEME TOGGLE ---
         const themeToggleBtn = document.getElementById('theme-toggle');
         const htmlElement = document.documentElement;
 
@@ -392,7 +399,7 @@
             }
         });
 
-        // --- LENIS.JS - APPLE SMOOTH SCROLL ---
+        // --- SMOOTH SCROLL LENIS ---
         const lenis = new Lenis({
             duration: 1.2, 
             easing: (t) => Math.min(1, 1.001 - Math.pow(2, -10 * t)), 
@@ -406,7 +413,7 @@
         requestAnimationFrame(raf);
         gsap.registerPlugin(ScrollTrigger);
 
-        // --- KURSOR ORAZ LOGO POCHYŁ TILT 3D ---
+        // --- KURSOR + GLB FIZYKA TILT ---
         const cursor = document.getElementById('cursor-dot');
         let mouseX = window.innerWidth / 2, mouseY = window.innerHeight / 2;
         let cursorX = window.innerWidth / 2, cursorY = window.innerHeight / 2;
@@ -418,13 +425,12 @@
             document.documentElement.style.setProperty('--mouse-x', `${mouseX}px`);
             document.documentElement.style.setProperty('--mouse-y', `${mouseY}px`);
             
-            // Logika nowej siły myszki od GSAP - Mniej dramatyczne nachylenia aby "N" nam tak szybko się po prostopadłych ścianach znikało.
             const logo = document.getElementById('logo-3d');
             const rect = logo.getBoundingClientRect();
             const logoCenterX = rect.left + (rect.width / 2);
             const logoCenterY = rect.top + (rect.height / 2);
 
-            const tiltMax = 12; // Zmienione by z dużego bliska się po prostu wygniatało szkłem, bez wielkich lewarów ucieczek horyzontalnych.
+            const tiltMax = 12; 
             const diffX = (mouseX - logoCenterX) / window.innerWidth;
             const diffY = (mouseY - logoCenterY) / window.innerHeight;
 
@@ -440,7 +446,9 @@
             const dt = 1.0 - Math.pow(1.0 - 0.2, gsap.ticker.deltaRatio());
             cursorX += (mouseX - cursorX) * dt;
             cursorY += (mouseY - cursorY) * dt;
-            cursor.style.transform = `translate3d(${cursorX}px, ${cursorY}px, 0) translate(-50%, -50%)`;
+            if (window.matchMedia("(pointer: fine)").matches) { // Bezpiecznik by ticker nie męczył dotyków u góry na chmurach styli:
+                cursor.style.transform = `translate3d(${cursorX}px, ${cursorY}px, 0) translate(-50%, -50%)`;
+            }
         });
 
         const applyHoverEffect = () => {
@@ -451,13 +459,13 @@
             });
         };
 
-        // UKRYWAMY KURSOR NA RZECZ DOMYŚLNEJ RĘCZKI NAD IFRAME - pozwala łatwo naciskać play! 
+        // DOMYŚLNE RĄCZKI WYBREDNIKA CSS NA NADZESKOLWANKACH 
         document.querySelectorAll('.spotify-embed-zone').forEach(zone => {
-            zone.addEventListener('mouseenter', () => cursor.style.opacity = '0');
-            zone.addEventListener('mouseleave', () => cursor.style.opacity = '1');
+            zone.addEventListener('mouseenter', () => { if(window.matchMedia("(pointer: fine)").matches) cursor.style.opacity = '0'; });
+            zone.addEventListener('mouseleave', () => { if(window.matchMedia("(pointer: fine)").matches) cursor.style.opacity = '1'; });
         });
 
-        // --- MAGNETYCZNE "NIGDY" BEZ ZASŁONY LINI (Ruch po ekranie z odjazdem) ---
+        // --- ZABAWKA: 'MAGNETYCZNE "NIGDY"' HERO ---
         const magnetText = document.getElementById('magnetic-text');
         const magnetWrap = document.querySelector('.magnetic-wrap');
 
@@ -475,7 +483,7 @@
             gsap.to(magnetText, { x: 0, y: 0, rotation: 0, duration: 1, ease: "elastic.out(1, 0.3)" });
         });
 
-        // --- PIOSENKA DNIA API Z "daily.js" ---
+        // --- SYSTEM Z SPOTIFY / SONG DNIA JS  ---
         if (typeof todayTrackId !== 'undefined') {
             const songWrapper = document.getElementById('song-of-the-day-container');
             setTimeout(() => {
@@ -489,7 +497,7 @@
             }, 1000); 
         }
 
-        // --- BAZOWY STOPER CZYSTY ---
+        // --- SZYBKI MINUTNIK ZAKONCZ ---
         const targetDate = new Date('2026-07-01T18:00:00+02:00').getTime();
         const fd = val => val < 10 ? `0${val}` : val; 
 
@@ -502,38 +510,24 @@
             document.getElementById('cd-secs').innerText = fd(Math.floor((distance % 60000) / 1000));
         }, 1000);
 
-        // --- GSAP ANIMACJE IN / EFEKT PORTALU BEZ-BŁĘDNY. ---
+        // --- SKOK GSAP OD SPODU DLA WARSTW ---
         gsap.utils.toArray('.fade-in-hero').forEach(i => gsap.from(i, { opacity: 0, y: 30, duration: 1.5, delay: 0.1, ease: "power3.out" }));
         gsap.utils.toArray('.fade-in-scroll').forEach(i => gsap.from(i, { scrollTrigger: { trigger: i, start: "top 85%" }, y: 50, opacity: 0, duration: 1.2, ease: "expo.out" }));
 
-        // Animacja Clip-Path na wklejenie się z podłogi sekcji Tiktoka
         const bubbleTl = gsap.timeline({
             scrollTrigger: {
                 trigger: '#timer-pin-wrapper',
                 start: 'top top', 
-                end: '+=150%', // Podwiesza blok na czas wkraczania stopek. Pozbywa to Luki Paskowej.
-                pin: true,     // Przybij gładziutko do sufitu. W GSAP nie psuje to dom jak zrobiony clip
+                end: '+=150%', 
+                pin: true,     
                 scrub: 1, 
             }
         });
 
-        // 1. Zwykła i cicha rotacja z poszerzeniem koła bez psucia struktury css. (wartość clip at na zmiennnej)
-        bubbleTl.to('#bubble-portal-layer', {
-            clipPath: 'circle(150% at 50% 50%)', 
-            webkitClipPath: 'circle(150% at 50% 50%)', 
-            ease: 'power2.inOut',
-            duration: 1
-        }, 0);
+        bubbleTl.to('#bubble-portal-layer', { clipPath: 'circle(150% at 50% 50%)', webkitClipPath: 'circle(150% at 50% 50%)', ease: 'power2.inOut', duration: 1 }, 0);
+        bubbleTl.to('#timer-text-content', { opacity: 1, filter: 'blur(0px)', ease: 'power1.out', duration: 0.5 }, 0.4); 
 
-        // 2. Wejscie blur tekstu na sam koniec
-        bubbleTl.to('#timer-text-content', {
-            opacity: 1, 
-            filter: 'blur(0px)',
-            ease: 'power1.out',
-            duration: 0.5 
-        }, 0.4); 
-
-        // --- SOCIALS RENDER KART I 3D EFEKTY SZKLA APPLE ---
+        // --- SKLENE PORTAL CARDS - LOGIKI ---
         if (typeof socialsData !== 'undefined' && socialsData.length === 4) {
             
             if (typeof discordLink !== 'undefined' && discordLink) {
@@ -554,9 +548,9 @@
                             <div class="glass-content-wrap pointer-events-none">
                                 <h3 class="text-xl md:text-2xl font-bold uppercase tracking-widest text-center mt-6">${p.name}</h3>
                                 <div class="flex justify-center gap-6 mb-8 w-full z-20 pointer-events-auto">
-                                    <a href="${p.instagram}" target="_blank" class="social-btn insta pointer-events-auto" aria-label="Insta"><span class="w-8 h-8 block pointer-events-none">${svgInsta}</span></a>
-                                    <a href="${p.youtube}" target="_blank" class="social-btn youtube pointer-events-auto" aria-label="YT"><span class="w-8 h-8 block pointer-events-none">${svgYT}</span></a>
-                                    <a href="${p.tiktok}" target="_blank" class="social-btn tiktok pointer-events-auto" aria-label="TikTok"><span class="w-8 h-8 block pointer-events-none">${svgTik}</span></a>
+                                    <a href="${p.instagram}" target="_blank" class="social-btn insta" aria-label="Insta"><span class="w-8 h-8 block pointer-events-none">${svgInsta}</span></a>
+                                    <a href="${p.youtube}" target="_blank" class="social-btn youtube" aria-label="YT"><span class="w-8 h-8 block pointer-events-none">${svgYT}</span></a>
+                                    <a href="${p.tiktok}" target="_blank" class="social-btn tiktok" aria-label="TikTok"><span class="w-8 h-8 block pointer-events-none">${svgTik}</span></a>
                                 </div>
                             </div>
                         </div>
@@ -565,7 +559,7 @@
             });
             socContainer.innerHTML = socHtml;
 
-            // FIZYKA SZKLANYCH KART - Ruch obrotowy by nadać realizm perspektywie karty. Zmianą jest obcięty pointer-event w div.
+            // Ruch kładzenia 3d dla telefonow odpada a działa dla pety na mouse!
             document.querySelectorAll('.card-wrapper').forEach(wrapper => {
                 const link = wrapper.querySelector('.glass-link');
                 wrapper.addEventListener('mousemove', (e) => {
@@ -575,20 +569,22 @@
 
                     link.style.setProperty('--mouse-x', `${x}px`);
                     link.style.setProperty('--mouse-y', `${y}px`);
+                    
+                    if (window.matchMedia("(pointer: fine)").matches) {
+                        const centerX = rect.width / 2;
+                        const centerY = rect.height / 2;
+                        const rotateX = ((y - centerY) / centerY) * -12; 
+                        const rotateY = ((x - centerX) / centerX) * 12;
 
-                    const centerX = rect.width / 2;
-                    const centerY = rect.height / 2;
-                    const rotateX = ((y - centerY) / centerY) * -12; 
-                    const rotateY = ((x - centerX) / centerX) * 12;
-
-                    link.style.transform = `perspective(1000px) rotateX(${rotateX}deg) rotateY(${rotateY}deg) scale3d(1.02, 1.02, 1.02)`;
+                        link.style.transform = `perspective(1000px) rotateX(${rotateX}deg) rotateY(${rotateY}deg) scale3d(1.02, 1.02, 1.02)`;
+                    }
                 });
                 wrapper.addEventListener('mouseleave', () => {
                     link.style.transform = `perspective(1000px) rotateX(0deg) rotateY(0deg) scale3d(1, 1, 1)`;
                 });
             });
 
-            applyHoverEffect(); // Spędza nowe przyciski do tablic dla nadmuszkiwania rozmiaru
+            applyHoverEffect(); 
         }
     </script>
 </body>
